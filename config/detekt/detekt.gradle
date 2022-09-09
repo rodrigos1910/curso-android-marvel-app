@@ -1,0 +1,40 @@
+apply plugin: "io.gitlab.arturbosch.detekt"
+
+project.afterEvaluate {
+    tasks.named("preBuild"){
+        dependsOn("detekt")
+    }
+}
+
+
+detekt {
+    toolVersion = "$detekt_version"
+    def inputDirFIle = []
+    rootProject.subprojects.each{ module ->
+        inputDirFIle << "$module.projectDir/src/main/java"
+    }
+    source = files(inputDirFIle)
+    config = files("$rootDir/config/detekt/detekt.yml")
+    autoCorrect = true
+    reports {
+        // Enable/Disable XML report (default: true)
+        xml{
+            enabled = true
+            destination = file("$buildDir/reports/detekt/detekt.xml")
+        }
+
+        html{
+            enabled = true
+            destination = file("$buildDir/reports/detekt/detekt.html")
+        }
+
+        txt{
+            enabled = true
+            destination = file("$buildDir/reports/detekt/detekt.txt")
+        }
+
+
+    }
+
+
+}
